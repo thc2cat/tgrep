@@ -74,10 +74,10 @@ func main() {
 
 			if (distance <= keeps[lines-1].distance) || (distance <= keeps[0].distance) {
 				for line := 1; line < lines; line++ {
-					if keeps[line].distance != 0 {
+					if keeps[line].distance != 0 { // avoid copy if unitialised
 						keeps[line-1].distance = keeps[line].distance
+						keeps[line-1].text = keeps[line].text
 					}
-					keeps[line-1].text = keeps[line].text
 				}
 				keeps[lines-1].distance = distance
 				keeps[lines-1].text = texte
