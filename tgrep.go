@@ -36,7 +36,7 @@ func main() {
 	flag.Parse()
 
 	if version {
-		fmt.Println("tgrep v0.2")
+		fmt.Println("tgrep v0.22")
 		os.Exit(0)
 	}
 	if lines < 1 {
