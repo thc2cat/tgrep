@@ -1,6 +1,5 @@
 
-# tgrep
-
+# tgrep [![Build Status](https://img.shields.io/travis/thc2cat/tgrep.svg?style=flat-square)](https://travis-ci.org/thc2cat/tgrep)
 `tgrep` is a cli wich purpose is to find the n nearest syslog timestamped lines from stdin ( from tools like grep,awk, )
 
 ## Getting Started
