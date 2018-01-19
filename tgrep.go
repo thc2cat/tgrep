@@ -117,6 +117,7 @@ func reSubMatchMap(r *regexp.Regexp, str string) map[string]string {
 
 // WithTwosComplement return Abs without math.
 func WithTwosComplement(n int64) int64 {
+	// http://cavaliercoder.com/blog/optimized-abs-for-int64-in-go.html
 	y := n >> 63       // y ← x ⟫ 63
 	return (n ^ y) - y // (x ⨁ y) - y
 }
