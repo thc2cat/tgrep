@@ -34,7 +34,7 @@ type keep struct {
 func main() {
 
 	flag.StringVar(&stime, "t", stampRef, "approximate timestamp to look after")
-	flag.IntVar(&lines, "n", 1, "#lines to ouput")
+	flag.IntVar(&lines, "n", 1, "#lines to output")
 	flag.BoolVar(&version, "v", false, "prints current version")
 	flag.Parse()
 
