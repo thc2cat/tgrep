@@ -8,7 +8,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"regexp"
 	"time"
@@ -25,7 +24,9 @@ var (
 
 type keep struct {
 	text     string
-	distance float64
+	distance int64
+	//	distance float64
+
 }
 
 func main() {
@@ -48,7 +49,8 @@ func main() {
 	}
 
 	stampRefT, _ := time.Parse(time.Stamp, stampRef)
-	bestdistance := math.Abs(float64(t.Sub(stampRefT))) // far distance
+	//bestdistance := math.Abs(float64(t.Sub(stampRefT))) // far distance
+	bestdistance := WithTwosComplement(int64(t.Sub(stampRefT)))
 
 	// buffer for keeping best lines
 	keeps := make([]keep, lines)
@@ -70,7 +72,8 @@ func main() {
 				log.Printf("Error in date parsing -->%s<-- \n", results["date"])
 				continue
 			}
-			distance := math.Abs(float64(t.Sub(d)))
+			//distance := math.Abs(float64(t.Sub(d)))
+			distance := WithTwosComplement(int64(t.Sub(d)))
 
 			if (distance <= keeps[lines-1].distance) || (distance <= keeps[0].distance) {
 				for line := 1; line < lines; line++ {
@@ -108,4 +111,10 @@ func reSubMatchMap(r *regexp.Regexp, str string) map[string]string {
 		}
 	}
 	return subMatchMap
+}
+
+// WithTwosComplement return Abs without math.
+func WithTwosComplement(n int64) int64 {
+	y := n >> 63       // y ← x ⟫ 63
+	return (n ^ y) - y // (x ⨁ y) - y
 }
