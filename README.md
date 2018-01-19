@@ -40,7 +40,7 @@ Please read, fork and PR
 
 ## License (later)
 
-This project is licensed under the whatever License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the ?? License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 

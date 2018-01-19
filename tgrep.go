@@ -1,6 +1,10 @@
 // tgrep.go
 //  tgrep read stdin and find N lines within best timestamp distance
 //
+// Author : thc2cat@gmail.com
+// 2018, ?? License
+//
+
 package main
 
 import (
@@ -25,8 +29,6 @@ var (
 type keep struct {
 	text     string
 	distance int64
-	//	distance float64
-
 }
 
 func main() {
@@ -49,7 +51,6 @@ func main() {
 	}
 
 	stampRefT, _ := time.Parse(time.Stamp, stampRef)
-	//bestdistance := math.Abs(float64(t.Sub(stampRefT))) // far distance
 	bestdistance := WithTwosComplement(int64(t.Sub(stampRefT)))
 
 	// buffer for keeping best lines
@@ -66,29 +67,30 @@ func main() {
 	for s.Scan() {
 		texte := s.Text()
 		results := reSubMatchMap(stampRegexp, texte)
-		if results != nil {
-			d, err := time.Parse(time.Stamp, results["date"])
-			if err != nil {
-				log.Printf("Error in date parsing -->%s<-- \n", results["date"])
-				continue
-			}
-			//distance := math.Abs(float64(t.Sub(d)))
-			distance := WithTwosComplement(int64(t.Sub(d)))
-
-			if (distance <= keeps[lines-1].distance) || (distance <= keeps[0].distance) {
-				for line := 1; line < lines; line++ {
-					if keeps[line].distance != 0 { // avoid copy if unitialised
-						keeps[line-1].distance = keeps[line].distance
-						keeps[line-1].text = keeps[line].text
-					}
-				}
-				keeps[lines-1].distance = distance
-				keeps[lines-1].text = texte
-			}
-			if (distance > keeps[lines-1].distance) && (distance > keeps[0].distance) {
-				break // too far in the file
-			}
+		if results == nil {
+			continue
 		}
+		d, err := time.Parse(time.Stamp, results["date"])
+		if err != nil {
+			log.Printf("Error in date parsing -->%s<-- \n", results["date"])
+			continue
+		}
+		distance := WithTwosComplement(int64(t.Sub(d)))
+
+		if (distance <= keeps[lines-1].distance) || (distance <= keeps[0].distance) {
+			for line := 1; line < lines; line++ {
+				if keeps[line].distance != 0 { // avoid copy if unitialised
+					keeps[line-1].distance = keeps[line].distance
+					keeps[line-1].text = keeps[line].text
+				}
+			}
+			keeps[lines-1].distance = distance
+			keeps[lines-1].text = texte
+		}
+		if (distance > keeps[lines-1].distance) && (distance > keeps[0].distance) {
+			break // too far in the file
+		}
+
 	}
 
 	for line := 0; line < lines; line++ {
