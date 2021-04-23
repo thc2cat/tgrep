@@ -37,8 +37,8 @@ type keep struct {
 func main() {
 
 	flag.StringVar(&stime, "t", stampRef, "approximate timestamp to look after")
-	flag.IntVar(&lines, "n", 1, "#lines to output")
-	flag.BoolVar(&version, "v", false, fmt.Sprintf("prints current version :  %s", versionS))
+	flag.IntVar(&lines, "n", 1, "lines count for output")
+	flag.BoolVar(&version, "v", false, fmt.Sprintf("prints current version (%s)", versionS))
 	flag.StringVar(&datafile, "f", "-", "read data from file instead of stdin")
 	flag.Parse()
 
@@ -51,7 +51,7 @@ func main() {
 	}
 	t, err := time.Parse(time.Stamp, stime)
 	if err != nil {
-		log.Fatal("ERROR: parsing timestamp ", err)
+		log.Fatal("ERROR: time.Parse timestamp ", err)
 	}
 
 	stampRefT, _ := time.Parse(time.Stamp, stampRef)
@@ -82,7 +82,7 @@ func main() {
 		}
 		d, err := time.Parse(time.Stamp, results["date"])
 		if err != nil {
-			log.Printf("Error in date parsing -->%s<-- \n", results["date"])
+			log.Printf("Error time.Parse -->%s<--\n", results["date"])
 			continue
 		}
 		distance := WithTwosComplement(int64(t.Sub(d)))
