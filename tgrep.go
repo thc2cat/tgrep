@@ -3,6 +3,7 @@
 //
 // Author : thc2cat@gmail.com
 // 2018, ?? License
+// 2021 v0.23 Bug corrections
 //
 
 package main
@@ -24,6 +25,7 @@ var (
 
 	stampRegexp = regexp.MustCompile(`^(?P<date>(... .. ..:..:..))`)
 	stampRef    = "Jan 1 00:00:00"
+	versionS    = "tgrep v0.23"
 )
 
 type keep struct {
@@ -35,15 +37,15 @@ func main() {
 
 	flag.StringVar(&stime, "t", stampRef, "approximate timestamp to look after")
 	flag.IntVar(&lines, "n", 1, "#lines to output")
-	flag.BoolVar(&version, "v", false, "prints current version")
+	flag.BoolVar(&version, "v", false, fmt.Sprintf("prints current version :  %s", versionS))
 	flag.Parse()
 
 	if version {
-		fmt.Println("tgrep v0.22")
+		fmt.Println(versionS)
 		os.Exit(0)
 	}
 	if lines < 1 {
-		log.Fatal("lines must be >0  ")
+		log.Fatal("ERROR: line count must be >0 ")
 	}
 	t, err := time.Parse(time.Stamp, stime)
 	if err != nil {
@@ -53,7 +55,7 @@ func main() {
 	stampRefT, _ := time.Parse(time.Stamp, stampRef)
 	bestdistance := WithTwosComplement(int64(t.Sub(stampRefT)))
 
-	// buffer for keeping best lines
+	// buffer for keeping nearest lines
 	keeps := make([]keep, lines)
 	keeps[0].distance = bestdistance
 	keeps[lines-1].distance = bestdistance
@@ -77,9 +79,9 @@ func main() {
 		}
 		distance := WithTwosComplement(int64(t.Sub(d)))
 
-		if (distance <= keeps[lines-1].distance) || (distance <= keeps[0].distance) {
-			for line := 1; line < lines; line++ {
-				if keeps[line].distance != 0 { // avoid copy if unitialised
+		if (distance == 0 || distance <= keeps[lines-1].distance) || (distance < keeps[0].distance) {
+			for line := 1; line < lines; line++ { // Keep best lines
+				if keeps[line].text != "" { // avoid copy if unitialised
 					keeps[line-1].distance = keeps[line].distance
 					keeps[line-1].text = keeps[line].text
 				}
@@ -94,7 +96,7 @@ func main() {
 	}
 
 	for line := 0; line < lines; line++ {
-		if keeps[line].text != "" { // keeps may contain empty lines
+		if (keeps[line].text != "") || (keeps[line].distance != 0) { // keeps may contain empty lines
 			fmt.Println(keeps[line].text)
 		}
 	}
