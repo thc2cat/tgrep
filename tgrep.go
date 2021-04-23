@@ -19,9 +19,10 @@ import (
 )
 
 var (
-	stime   string
-	lines   int
-	version bool
+	stime    string
+	lines    int
+	version  bool
+	datafile string
 
 	stampRegexp = regexp.MustCompile(`^(?P<date>(... .. ..:..:..))`)
 	stampRef    = "Jan 1 00:00:00"
@@ -38,6 +39,7 @@ func main() {
 	flag.StringVar(&stime, "t", stampRef, "approximate timestamp to look after")
 	flag.IntVar(&lines, "n", 1, "#lines to output")
 	flag.BoolVar(&version, "v", false, fmt.Sprintf("prints current version :  %s", versionS))
+	flag.StringVar(&datafile, "f", "-", "read data from file instead of stdin")
 	flag.Parse()
 
 	if version {
@@ -60,12 +62,18 @@ func main() {
 	keeps[0].distance = bestdistance
 	keeps[lines-1].distance = bestdistance
 
-	// f, _ := os.Open("test.log")
-	// defer f.Close()
-	// s := bufio.NewScanner(f)
-	// Scanner read from Stdin otherwise
-	s := bufio.NewScanner(os.Stdin)
-
+	var s *bufio.Scanner
+	if datafile != "-" { // read from datafile parameter
+		f, errf := os.Open(datafile)
+		if errf != nil {
+			log.Fatal(errf)
+		}
+		defer f.Close()
+		s = bufio.NewScanner(f)
+	} else {
+		// Scanner read from Stdin otherwise
+		s = bufio.NewScanner(os.Stdin)
+	}
 	for s.Scan() {
 		texte := s.Text()
 		results := reSubMatchMap(stampRegexp, texte)
